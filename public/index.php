@@ -9,9 +9,12 @@
 
 <body>
     <h1>Select user role</h1>
-    <form action="controllerReparation.php" method="get">
-        <input type="submit" value="client" name="userType">
-        <input type="submit" value="employee" name="userType">
+    <form action="../src/View/viewReparation.php" method="get">
+        <select name="role">
+            <option value="employee">Employee</option>
+            <option value="client">Client</option>
+        </select>
+        <button type="submit">Login</button>
     </form>
 </body>
 </html>

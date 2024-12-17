@@ -2,20 +2,26 @@
 
 namespace Src\Model;
 
-class Reparation{
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+class reparation{
+    private string $uuid;
     private int $workshopId;
     private string $workshopName;
     private $registerDate;
     private string $licensePlate;
     private $image;
-    private $uuid;
 
-    public function __construct($workshopId, $workshopName, $registerDate, $licensePlate, $uuid){
+    public function __construct($uuid, $workshopId, $workshopName, $registerDate, $licensePlate){
+        $this->uuid = $uuid;
         $this->workshopId = $workshopId;
         $this->workshopName = $workshopName;
         $this->registerDate = $registerDate;
         $this->licensePlate = $licensePlate;
-        $this->uuid = $uuid;
+    }
+
+    public function getworkshopName(): string{
+        return $this->workshopName;
     }
 
     public function getworkshopId(): int{
@@ -38,8 +44,12 @@ class Reparation{
         return $this->image;
     }
 
-    public function getUuid(){
+    public function getUuid(): string{
         return $this->uuid;
+    }
+
+    public function setWorkshopName(int $workshopName): void{
+        $this->workshopName = $workshopName;
     }
 
     public function setWorkshopId(int $workshopId): void{
