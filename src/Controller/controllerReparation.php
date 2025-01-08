@@ -17,7 +17,7 @@ if(isset($_GET["getReparation"])){
     $controller->getReparation();
 }
 
-if(isset($_GET["insertReparation"])){
+if(isset($_POST["insertReparation"])){
     $controller->insertReparation();
 }
 
@@ -40,17 +40,22 @@ class controllerReparation{
     }
     
     function insertReparation(): void{
-        if (isset($_GET['workshopId'], $_GET['workshopName'], $_GET['registerDate'], $_GET['licensePlate'])) {
+        if (isset($_POST['workshopId'], $_POST['workshopName'], $_POST['registerDate'], $_POST['licensePlate'], $_FILES['photo'])) {
             $uuid = Uuid::uuid4()->toString();
-            $workshopId = $_GET['workshopId'];
-            $workshopName = $_GET['workshopName'];
-            $registerDate = $_GET['registerDate'];
-            $licensePlate = $_GET['licensePlate'];
+            $workshopId = $_POST['workshopId'];
+            $workshopName = $_POST['workshopName'];
+            $registerDate = $_POST['registerDate'];
+            $licensePlate = $_POST['licensePlate'];
+            $photo = null; // Inicializar en caso de que no se suba ninguna imagen
+            // if ($_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                $rawPhoto = file_get_contents($_FILES['photo']['tmp_name']); // Lee el contenido binario del archivo
+                $photo = base64_encode($rawPhoto); // Codifica en base64
+            // }
         }
 
         $service = new ServiceReparation();
         $view = new ViewReparation();
-        if($service->insertReparation($uuid, $workshopId, $workshopName, $registerDate, $licensePlate)){
+        if($service->insertReparation($uuid, $workshopId, $workshopName, $registerDate, $licensePlate, $photo)){
             $view->renderMessage("Reparation has been created correctly");
         }else{
             $view->renderMessage("ERROR: Reparation hasn't been created");

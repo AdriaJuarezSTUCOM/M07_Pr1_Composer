@@ -34,14 +34,14 @@ class serviceReparation{
         }
     }
     
-    public function insertReparation($uuid, $workshopId, $workshopName, $registerDate, $licensePlate): bool {
+    public function insertReparation($uuid, $workshopId, $workshopName, $registerDate, $licensePlate, $photo): bool {
         try{
             // Preparar la consulta SQL para insertar los datos
             $stmt = $this->mysqli->prepare("
-                INSERT INTO reparation (uuid, workshopId, workshopName, registerDate, licensePlate)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO reparation (uuid, workshopId, workshopName, registerDate, licensePlate, photo)
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
-            $stmt->bind_param('sssss', $uuid, $workshopId, $workshopName, $registerDate, $licensePlate);
+            $stmt->bind_param('ssssss', $uuid, $workshopId, $workshopName, $registerDate, $licensePlate, $photo);
         
             $stmt->execute();
             $stmt->close();
@@ -75,7 +75,8 @@ class serviceReparation{
                 $row["workshopId"],
                 $row["workshopName"],
                 $row["registerDate"],
-                $row["licensePlate"]
+                $row["licensePlate"],
+                $row["photo"]
             );
 
             // Mask photo if client

@@ -21,6 +21,10 @@ class viewReparation{
             <h1>Reparation Details</h1>
             <table border="1" cellspacing="0" cellpadding="10">
                 <tr>
+                    <th>UUID</th>
+                    <td><?php echo htmlspecialchars($reparation->getUuid()); ?></td>
+                </tr>
+                <tr>
                     <th>Workshop ID</th>
                     <td><?php echo htmlspecialchars($reparation->getworkshopId()); ?></td>
                 </tr>
@@ -36,16 +40,17 @@ class viewReparation{
                     <th>License Plate</th>
                     <td><?php echo htmlspecialchars($reparation->getLicensePlate()); ?></td>
                 </tr>
-                <!-- <tr>
+                <tr>
                     <th>Photo</th>
                     <td>
-                        <?php if ($reparation["photo"]): ?>
-                            <img src="<?php echo htmlspecialchars($reparation["photo"]); ?>" alt="Vehicle Photo" style="max-width: 300px; height: auto;">
+                        <?php if ($reparation->getImage()): ?>
+                            <img src="data:image/png;base64,<?php echo htmlspecialchars($reparation->getImage()); ?>" 
+                            alt="Vehicle Photo" style="max-width: 300px; height: auto;">
                         <?php else: ?>
                             No photo uploaded.
                         <?php endif; ?>
                     </td>
-                </tr> -->
+                </tr>
             </table>
         </body>
 <?php }} ?>
@@ -68,7 +73,7 @@ class viewReparation{
     <?php
         if(isset($_GET["role"]) && $_GET["role"] == "employee"){ ?>
             <h2>Register reparation</h2>
-            <form action="../Controller/controllerReparation.php" method="get">
+            <form action="../Controller/controllerReparation.php" method="post" enctype="multipart/form-data">
                 Workshop Id (4 numbers): <input type="number" name="workshopId" id="workshopId" maxlength="4" required><br>
                 Workshop Name (up to 12 characters): <input type="text" name="workshopName" id="workshopName" maxlength="12" required> <br>
                 Register Date (yyyy-mm-dd): <input type="text" name="registerDate" id="registerDate" pattern="\d{4}-\d{2}-\d{2}" required><br>

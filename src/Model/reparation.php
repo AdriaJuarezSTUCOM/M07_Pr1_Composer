@@ -12,12 +12,13 @@ class reparation{
     private string $licensePlate;
     private $image;
 
-    public function __construct($uuid, $workshopId, $workshopName, $registerDate, $licensePlate){
+    public function __construct($uuid, $workshopId, $workshopName, $registerDate, $licensePlate, $photo){
         $this->uuid = $uuid;
         $this->workshopId = $workshopId;
         $this->workshopName = $workshopName;
         $this->registerDate = $registerDate;
         $this->licensePlate = $licensePlate;
+        $this->image = $photo;
     }
 
     public function getworkshopName(): string{
@@ -26,10 +27,6 @@ class reparation{
 
     public function getworkshopId(): int{
         return $this->workshopId;
-    }
-
-    public function getName(): string{
-        return $this->workshopName;
     }
 
     public function getregisterDate(): string{
