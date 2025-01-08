@@ -12,7 +12,11 @@ if(session_status() == PHP_SESSION_NONE){
 }
 
 class viewReparation{
-    function render(Reparation $reparation) {?>
+    function renderMessage($message): void{
+        echo"$message<br>";
+    }
+
+    function renderReparation(Reparation $reparation): void {?>
         <body>
             <h1>Reparation Details</h1>
             <table border="1" cellspacing="0" cellpadding="10">
@@ -69,7 +73,7 @@ class viewReparation{
                 Workshop Name (up to 12 characters): <input type="text" name="workshopName" id="workshopName" maxlength="12" required> <br>
                 Register Date (yyyy-mm-dd): <input type="text" name="registerDate" id="registerDate" pattern="\d{4}-\d{2}-\d{2}" required><br>
                 License Plate (9999-XXX): <input type="text" name="licensePlate" id="licensePlate" pattern="\d{4}-[A-Za-z]{3}" required><br>
-                Photo of Damaged Vehicle: <input type="file" name="photo" id="photo" accept="image/*" required><br>
+                Photo of Damaged Vehicle: <input type="file" name="photo" id="photo" accept="image/*" ><br>
                 <br>
                 <input type="submit" value="Create" name="insertReparation">
             </form>

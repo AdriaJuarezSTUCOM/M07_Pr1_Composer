@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Src\Service\ServiceReparation;
 use Src\View\ViewReparation;
+use Ramsey\Uuid\Uuid;
 
 if(session_status() == PHP_SESSION_NONE){
     session_start();
@@ -22,17 +23,37 @@ if(isset($_GET["insertReparation"])){
 
 class controllerReparation{
     function getReparation(): void{
+        if(isset($_GET["uuid"])){
+            $idReparation = $_GET["uuid"];
+        }
         $role = $_SESSION["role"];
-        $idReparation = $_GET["uuid"];
     
         $service = new ServiceReparation();
         $reparation = $service->getReparation($role, $idReparation);
-    
+
         $view = new ViewReparation();
-        $view->render($reparation);
+        if($reparation !== null){
+            $view->renderReparation($reparation);
+        }else{
+            $view->renderMessage("ERROR: That reparation does not exist");
+        }
     }
     
     function insertReparation(): void{
-    
+        if (isset($_GET['workshopId'], $_GET['workshopName'], $_GET['registerDate'], $_GET['licensePlate'])) {
+            $uuid = Uuid::uuid4()->toString();
+            $workshopId = $_GET['workshopId'];
+            $workshopName = $_GET['workshopName'];
+            $registerDate = $_GET['registerDate'];
+            $licensePlate = $_GET['licensePlate'];
+        }
+
+        $service = new ServiceReparation();
+        $view = new ViewReparation();
+        if($service->insertReparation($uuid, $workshopId, $workshopName, $registerDate, $licensePlate)){
+            $view->renderMessage("Reparation has been created correctly");
+        }else{
+            $view->renderMessage("ERROR: Reparation hasn't been created");
+        }
     }
 }

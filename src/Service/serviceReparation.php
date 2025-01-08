@@ -34,31 +34,58 @@ class serviceReparation{
         }
     }
     
-    public function insertReparation(){
+    public function insertReparation($uuid, $workshopId, $workshopName, $registerDate, $licensePlate): bool {
+        try{
+            // Preparar la consulta SQL para insertar los datos
+            $stmt = $this->mysqli->prepare("
+                INSERT INTO reparation (uuid, workshopId, workshopName, registerDate, licensePlate)
+                VALUES (?, ?, ?, ?, ?)
+            ");
+            $stmt->bind_param('sssss', $uuid, $workshopId, $workshopName, $registerDate, $licensePlate);
         
+            $stmt->execute();
+            $stmt->close();
+
+            return true;
+        }catch(\Exception){
+            return false;
+        }
     }
     
-    public function getReparation($role, $idReparation): Reparation{
-        $stmt = $this->mysqli->prepare("SELECT * FROM reparation WHERE uuid = ?");
-        $stmt->bind_param('s', $idReparation);
-        $stmt->execute();
+    
+    public function getReparation($role, $idReparation){
+        try{
+            $stmt = $this->mysqli->prepare("SELECT * FROM reparation WHERE uuid = ?");
+            $stmt->bind_param('s', $idReparation);
+            $stmt->execute();
 
-        $result = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
+            // Obtener el resultado
+            $result = $stmt->get_result();
+            $stmt->close();
 
-        $reparation = new Reparation(
-            $result["uuid"],
-            $result["workshopId"],
-            $result["workshopName"],
-            $result["registerDate"],
-            $result["licensePlate"]
-        );
+            // Verificar si se encontró un resultado
+            if ($result->num_rows === 0) {
+                return null;
+            }
 
-        //mask photo if client
-        if($role == "client"){
+            $row = $result->fetch_assoc();
 
+            $reparation = new Reparation(
+                $row["uuid"],
+                $row["workshopId"],
+                $row["workshopName"],
+                $row["registerDate"],
+                $row["licensePlate"]
+            );
+
+            // Mask photo if client
+            if ($role == "client") {
+            }
+
+            return $reparation;
+
+        }catch(\Exception){
+            return null;
         }
-
-        return $reparation;
     }
 }
