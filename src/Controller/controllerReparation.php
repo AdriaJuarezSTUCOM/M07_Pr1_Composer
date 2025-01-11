@@ -47,18 +47,24 @@ class controllerReparation{
             $registerDate = $_POST['registerDate'];
             $licensePlate = $_POST['licensePlate'];
             $photo = null; // Inicializar en caso de que no se suba ninguna imagen
-            // if ($_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-                $rawPhoto = file_get_contents($_FILES['photo']['tmp_name']); // Lee el contenido binario del archivo
-                $photo = base64_encode($rawPhoto); // Codifica en base64
-            // }
-        }
+            
+            // Verificar si se subió una imagen y no hubo errores
+            if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                // Leer el contenido binario de la imagen
+                $photo = file_get_contents($_FILES['photo']['tmp_name']);
+                $photo = base64_decode($photo);
+            } else {
+                error_log("Error al cargar la imagen: " . $_FILES['photo']['error']);
+            }
+        
 
-        $service = new ServiceReparation();
-        $view = new ViewReparation();
-        if($service->insertReparation($uuid, $workshopId, $workshopName, $registerDate, $licensePlate, $photo)){
-            $view->renderMessage("Reparation has been created correctly");
-        }else{
-            $view->renderMessage("ERROR: Reparation hasn't been created");
+            $service = new ServiceReparation();
+            $view = new ViewReparation();
+            if($service->insertReparation($uuid, $workshopId, $workshopName, $registerDate, $licensePlate, $photo)){
+                $view->renderMessage("Reparation has been created correctly");
+            }else{
+                $view->renderMessage("ERROR: Reparation hasn't been created");
+            }
         }
     }
 }
