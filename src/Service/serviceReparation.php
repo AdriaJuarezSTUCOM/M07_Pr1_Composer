@@ -10,31 +10,47 @@ use Intervention\Image\Typography\FontFactory;
 
 use Src\Model\Reparation;
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 class serviceReparation{
     private $mysqli;
+    private $logger;
 
     public function __construct() {
+        // Configurar el logger
+        $this->logger = new Logger('reparation_logger');
+        $this->logger->pushHandler(new StreamHandler(__DIR__ . '/../../logs/app_workshop.log'));
+
         $this->connect();
     }
 
     function connect(): void {
-        $configFile = '../../cfg/db_config.ini';
-        $dbParams = parse_ini_file($configFile, true)['params_db_sql'];
-
-        if (!$dbParams || !isset($dbParams['host'], $dbParams['user'], $dbParams['pwd'], $dbParams['db_name'])) {
-            throw new Exception("Error al leer el archivo de configuración.");
-        }
-
-        $this->mysqli = new \mysqli(
-            $dbParams['host'],
-            $dbParams['user'],
-            $dbParams['pwd'],
-            $dbParams['db_name'],
-            $dbParams['port']
-        );
-
-        if ($this->mysqli->connect_error) {
-            throw new Exception("Error de conexión: " . $this->mysqli->connect_error);
+        try{
+            $configFile = '../../cfg/db_config.ini';
+            $dbParams = parse_ini_file($configFile, true)['params_db_sql'];
+    
+            if (!$dbParams || !isset($dbParams['host'], $dbParams['user'], $dbParams['pwd'], $dbParams['db_name'])) {
+                // Log para la falta de parámetros de configuración
+                $this->logger->error("Error al leer el archivo de configuración.");
+                throw new Exception("Error al leer el archivo de configuración.");
+            }
+    
+            $this->mysqli = new \mysqli(
+                $dbParams['host'],
+                $dbParams['user'],
+                $dbParams['pwd'],
+                $dbParams['db_name'],
+                $dbParams['port']
+            );
+    
+            if ($this->mysqli->connect_error) {
+                // Log de error en la conexión
+                $this->logger->error("Error de conexión: " . $this->mysqli->connect_error);
+                throw new Exception("Error de conexión: " . $this->mysqli->connect_error);
+            }
+        }catch(Exception $e){
+            $this->logger->error("Error al intentar establecer conexión con la base de datos.");
         }
     }
     
@@ -45,15 +61,20 @@ class serviceReparation{
                 INSERT INTO reparation (uuid, workshopId, workshopName, registerDate, licensePlate, photo)
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
-            $stmt->bind_param('sssssb', $uuid, $workshopId, $workshopName, $registerDate, $licensePlate, $photo);
-        
+
+            $stmt->bind_param('ssssss', $uuid, $workshopId, $workshopName, $registerDate, $licensePlate, $photo);
             // $stmt->send_long_data(5, $photo);
 
             $stmt->execute();
             $stmt->close();
 
+            // Log de inserción exitosa
+            $this->logger->info("Reparación con UUID $uuid insertada correctamente.");
+
             return true;
-        }catch(Exception){
+        }catch(Exception $e){
+            // Log de error en la inserción
+            $this->logger->error("Error al insertar la reparación con UUID $uuid: " . $e->getMessage());
             return false;
         }
     }
@@ -71,6 +92,8 @@ class serviceReparation{
 
             // Verificar si se encontró un resultado
             if ($result->num_rows === 0) {
+                // Log de error si no se encuentra la reparación
+                $this->logger->warning("No se encontró la reparación con UUID $idReparation.");
                 return null;
             }
 
@@ -93,18 +116,18 @@ class serviceReparation{
         
                     // Crear una instancia de la imagen usando Intervention Image
                     $img = ImageManager::gd()->read($image);
-        
+
+                    // Agregar el pixelado
+                    $img->pixelate(40);
+
                     // Agregar la marca de agua con texto
-                    $img->text($reparation->getLicensePlate() . $reparation->getUuid(), 120, 100, function ($font) {
-                        $font->size(30);
+                    $img->text($reparation->getLicensePlate() . $reparation->getUuid(), 950, 75, function ($font) {
+                        $font->file(__DIR__ . "/../../resources/fonts/Arial.ttf");
+                        $font->size(70);
                         $font->color('black');
                         $font->align('center');
                         $font->valign('middle');
-                        $font->angle(10);
                     });
-
-                    // Agregar el pixelado
-                    $img->pixelate(10);
                     
                     $img = base64_encode($img->encode());
         
@@ -122,12 +145,12 @@ class serviceReparation{
                     $img = ImageManager::gd()->read($image);
         
                     // Agregar la marca de agua con texto
-                    $img->text($reparation->getLicensePlate() . $reparation->getUuid(), 120, 100, function ($font) {
-                        $font->size(30);
+                    $img->text($reparation->getLicensePlate() . $reparation->getUuid(), 950, 75, function ($font) {
+                        $font->file(__DIR__ . "/../../resources/fonts/Arial.ttf");
+                        $font->size(70);
                         $font->color('black');
                         $font->align('center');
                         $font->valign('middle');
-                        $font->angle(10);
                     });
                     
                     $img = base64_encode($img->encode());
@@ -139,9 +162,14 @@ class serviceReparation{
                 }
             }
 
+            // Log de éxito en la consulta
+            $this->logger->info("Reparación con UUID $idReparation encontrada.");
+            
             return $reparation;
 
-        }catch(Exception){
+        }catch(Exception $e){
+            // Log de error en la consulta
+            $this->logger->error("Error al consultar la reparación con UUID $idReparation: " . $e->getMessage());
             return null;
         }
     }

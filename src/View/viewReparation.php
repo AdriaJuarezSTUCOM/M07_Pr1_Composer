@@ -44,7 +44,7 @@ class viewReparation{
                     <th>Photo</th>
                     <td>
                         <?php if ($reparation->getImage()): ?>
-                            <img src="data:image/png;base64,<?php echo htmlspecialchars($reparation->getImage()); ?>" 
+                            <img src="data:image/*;base64,<?php echo htmlspecialchars($reparation->getImage()); ?>" 
                             alt="Vehicle Photo" style="max-width: 300px; height: auto;">
                         <?php else: ?>
                             No photo uploaded.
@@ -74,8 +74,8 @@ class viewReparation{
         if(isset($_GET["role"]) && $_GET["role"] == "employee"){ ?>
             <h2>Register reparation</h2>
             <form action="../Controller/controllerReparation.php" method="post" enctype="multipart/form-data">
-                Workshop Id (4 numbers): <input type="number" name="workshopId" id="workshopId" maxlength="4" required><br>
-                Workshop Name (up to 12 characters): <input type="text" name="workshopName" id="workshopName" maxlength="12" required> <br>
+                Workshop Id (4 numbers): <input type="number" name="workshopId" id="workshopId" maxlength="4" pattern="\d{4}" required><br>
+                Workshop Name (up to 12 characters): <input type="text" name="workshopName" id="workshopName" maxlength="12" pattern="[A-Za-z0-9 ]{1,12}" required> <br>
                 Register Date (yyyy-mm-dd): <input type="text" name="registerDate" id="registerDate" pattern="\d{4}-\d{2}-\d{2}" required><br>
                 License Plate (9999-XXX): <input type="text" name="licensePlate" id="licensePlate" pattern="\d{4}-[A-Za-z]{3}" required><br>
                 Photo of Damaged Vehicle: <input type="file" name="photo" id="photo" accept="image/*" ><br>

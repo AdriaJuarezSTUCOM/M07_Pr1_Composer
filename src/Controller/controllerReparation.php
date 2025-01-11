@@ -46,13 +46,12 @@ class controllerReparation{
             $workshopName = $_POST['workshopName'];
             $registerDate = $_POST['registerDate'];
             $licensePlate = $_POST['licensePlate'];
-            $photo = null; // Inicializar en caso de que no se suba ninguna imagen
             
             // Verificar si se subió una imagen y no hubo errores
             if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
                 // Leer el contenido binario de la imagen
                 $photo = file_get_contents($_FILES['photo']['tmp_name']);
-                $photo = base64_decode($photo);
+                $photo = base64_encode($photo);
             } else {
                 error_log("Error al cargar la imagen: " . $_FILES['photo']['error']);
             }
